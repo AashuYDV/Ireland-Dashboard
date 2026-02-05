@@ -1,0 +1,2109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ireland Jobs Dashboard | Leap Scholar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #4A47FF;
+            --primary-dark: #232270;
+            --primary-gradient: linear-gradient(81deg, #3C3ACC 14.27%, #4A47FF 85.65%);
+            --purple-accent: #6F5ACC;
+            --bg-primary: #FFFFFF;
+            --bg-secondary: #F8F9FB;
+            --bg-card: #FFFFFF;
+            --bg-dark: #1C2233;
+            --text-primary: #1C2233;
+            --text-secondary: #64748B;
+            --text-muted: #A6ADB8;
+            --border: #E2E6EA;
+            --border-hover: #C6CBD2;
+            --success: #3A9E59;
+            --success-light: #F0FAF3;
+            --warning: #D99429;
+            --warning-light: #FFF8E6;
+            --danger: #C63A3A;
+            --shadow-sm: 0 1px 3px rgba(28, 34, 51, 0.08);
+            --shadow-md: 0 4px 12px rgba(28, 34, 51, 0.1);
+            --shadow-lg: 0 8px 24px rgba(28, 34, 51, 0.12);
+            --shadow-primary: 0 4px 16px rgba(74, 71, 255, 0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 1rem; }
+
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-secondary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem; }
+
+        .header {
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+        }
+        .logo-text {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            font-size: 1.25rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: var(--success-light);
+            color: var(--success);
+            padding: 0.3rem 0.6rem;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: none;
+            border: none;
+            color: var(--primary-blue);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            padding: 0.5rem 0;
+            transition: gap 0.2s ease;
+        }
+        .back-btn:hover { gap: 0.6rem; }
+
+        .hero {
+            background: linear-gradient(135deg, #F0F0FF 0%, #F8F9FB 50%, #F0F8FF 100%);
+            padding: 1.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .hero-content { text-align: center; }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: var(--bg-primary);
+            padding: 0.4rem 0.8rem;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+        }
+        .hero-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: clamp(1.5rem, 3.5vw, 2rem);
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.35rem;
+        }
+        .hero-title span {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+        @media (max-width: 768px) { .stats-summary { grid-template-columns: repeat(2, 1fr); } }
+        .stat-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.875rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+        }
+        .stat-card.primary {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+        }
+        .stat-card.primary .stat-number,
+        .stat-card.primary .stat-label,
+        .stat-card.primary .stat-change { color: white; }
+        .stat-number {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-top: 0.15rem;
+            font-weight: 500;
+        }
+        .stat-change {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: var(--success);
+            margin-top: 0.2rem;
+        }
+        .stat-card.primary .stat-change {
+            background: rgba(255,255,255,0.2);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+        }
+
+        .trust-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.25rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+
+        main { padding: 1.25rem 0; }
+
+        .filter-section {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+        .filter-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .filter-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .active-filters {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+        }
+        .active-filter-tag {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: #F0F0FF;
+            color: var(--primary-blue);
+            padding: 0.25rem 0.6rem;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .remove-filter {
+            background: none;
+            border: none;
+            color: var(--primary-blue);
+            cursor: pointer;
+            font-size: 0.9rem;
+            line-height: 1;
+            opacity: 0.7;
+        }
+        .filter-group { margin-bottom: 0.6rem; }
+        .filter-group:last-child { margin-bottom: 0; }
+        .filter-group-label {
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.4rem;
+        }
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+        .filter-chip {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 0.4rem 0.7rem;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        .filter-chip:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+            background: #F0F0FF;
+        }
+        .filter-chip.active {
+            background: var(--primary-gradient);
+            border-color: var(--primary-blue);
+            color: white;
+        }
+        .clear-filters {
+            background: none;
+            border: none;
+            color: var(--primary-blue);
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            padding: 0.4rem;
+        }
+
+        .results-summary {
+            background: linear-gradient(135deg, #F0F0FF 0%, #F8F0FF 100%);
+            border: 1px solid rgba(74, 71, 255, 0.2);
+            border-radius: 10px;
+            padding: 0.875rem 1rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        .results-summary.visible { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .results-summary-header { margin-bottom: 0.6rem; }
+        .results-summary-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+        }
+        .results-summary-title span { color: var(--primary-blue); }
+        .results-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.6rem;
+        }
+        @media (max-width: 640px) { .results-summary-grid { grid-template-columns: repeat(2, 1fr); } }
+        .summary-item {
+            background: var(--bg-primary);
+            border-radius: 8px;
+            padding: 0.6rem;
+            text-align: center;
+        }
+        .summary-item-value {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--primary-blue);
+        }
+        .summary-item-label {
+            font-size: 0.6rem;
+            color: var(--text-secondary);
+            margin-top: 0.1rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+        .section-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .result-count {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .result-count span {
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+
+        .jobs-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+        }
+        @media (max-width: 1024px) { .jobs-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 768px) { .jobs-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 480px) { .jobs-grid { grid-template-columns: 1fr; } }
+
+        .job-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 0.875rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+        }
+        .job-card:hover {
+            border-color: var(--primary-blue);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-3px);
+        }
+        .job-card.hidden { display: none; }
+        .job-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .job-rank {
+            width: 22px;
+            height: 22px;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+        .job-card:nth-child(1) .job-rank { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #1a1a1a; }
+        .job-card:nth-child(2) .job-rank { background: linear-gradient(135deg, #C0C0C0 0%, #A0A0A0 100%); color: #1a1a1a; }
+        .job-card:nth-child(3) .job-rank { background: linear-gradient(135deg, #CD7F32 0%, #B8860B 100%); color: white; }
+        .job-category-badge {
+            font-size: 0.6rem;
+            font-weight: 600;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            background: #F0F0FF;
+            color: var(--primary-blue);
+        }
+        .job-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+            line-height: 1.2;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .job-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+            margin-bottom: 0.5rem;
+        }
+        .job-count {
+            font-size: 0.8rem;
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+        .job-location {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .job-skills { margin-bottom: 0.5rem; }
+        .skills-label {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-bottom: 0.25rem;
+        }
+        .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+        }
+        .skill-tag {
+            background: var(--bg-secondary);
+            padding: 0.15rem 0.35rem;
+            border-radius: 3px;
+            font-size: 0.6rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        .job-badges {
+            display: flex;
+            gap: 0.3rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.5rem;
+        }
+        .work-mode-badge {
+            font-size: 0.6rem;
+            padding: 0.15rem 0.35rem;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+        .work-mode-badge.remote { background: #E8F5E9; color: #2E7D32; }
+        .work-mode-badge.hybrid { background: #FFF3E0; color: #E65100; }
+        .work-mode-badge.onsite { background: #E3F2FD; color: #1565C0; }
+        .exp-badge {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            background: var(--bg-secondary);
+            padding: 0.15rem 0.35rem;
+            border-radius: 3px;
+        }
+        .job-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 0.5rem;
+            border-top: 1px solid var(--border);
+            margin-top: auto;
+        }
+        .see-more-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+            background: none;
+            border: none;
+            color: var(--primary-blue);
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+        .see-more-btn:hover { gap: 0.35rem; }
+
+        .no-results {
+            text-align: center;
+            padding: 2rem 1rem;
+            background: var(--bg-primary);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            display: none;
+        }
+        .no-results.visible { display: block; }
+        .no-results-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+        .no-results-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 0.35rem;
+        }
+        .no-results-text {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .bottom-spacer { height: 85px; }
+
+        .bottom-cta {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border);
+            padding: 0.875rem 1rem;
+            z-index: 100;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+        }
+        .cta-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        @media (max-width: 640px) { .cta-container { flex-direction: column; text-align: center; } }
+        .cta-text { flex: 1; }
+        .cta-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+        .cta-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        .cta-primary {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 0.875rem 2rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow-primary);
+            white-space: nowrap;
+        }
+        .cta-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(74, 71, 255, 0.4);
+        }
+        .cta-secondary {
+            background: var(--bg-primary);
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+            padding: 0.65rem 1rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+        .cta-secondary:hover { background: #F0F0FF; }
+
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--bg-primary);
+            border: 1px solid var(--success);
+            color: var(--text-primary);
+            padding: 0.875rem 1.25rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1001;
+            box-shadow: var(--shadow-lg);
+        }
+        .toast.visible { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .toast-icon { color: var(--success); font-size: 1.1rem; }
+
+        .page { display: none; }
+        .page.active { display: block; }
+
+        .detail-hero {
+            background: linear-gradient(135deg, #F0F0FF 0%, #F8F9FB 50%, #F0F8FF 100%);
+            padding: 1.25rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .detail-hero-content {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .detail-hero-info { flex: 1; }
+        .detail-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.35rem;
+        }
+        .detail-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .detail-subtitle span { display: flex; align-items: center; gap: 0.25rem; }
+        .detail-stats { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+        .detail-stat {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            text-align: center;
+            min-width: 100px;
+        }
+        .detail-stat-value {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+        .detail-stat-label { font-size: 0.65rem; color: var(--text-secondary); }
+
+        .detail-filters {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 0.875rem 1rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+        .detail-filters-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        .detail-filters-row .filter-chip { padding: 0.35rem 0.6rem; font-size: 0.7rem; }
+
+        .job-listing-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 0.875rem;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+        }
+        .job-listing-card:hover {
+            border-color: var(--primary-blue);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        .job-listing-card.real-job {
+            border-left: 4px solid var(--success);
+        }
+        .job-listing-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+            gap: 1rem;
+        }
+        .job-listing-title-section { flex: 1; }
+        .job-listing-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+        .job-listing-company {
+            font-size: 0.85rem;
+            color: var(--primary-blue);
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        .job-listing-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .job-listing-meta span { display: flex; align-items: center; gap: 0.25rem; }
+        .job-listing-badges { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+        .job-listing-badges .work-mode-badge,
+        .job-listing-badges .exp-badge { font-size: 0.7rem; padding: 0.25rem 0.5rem; }
+        .job-listing-description {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.6;
+            margin-bottom: 0.75rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .job-listing-skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem;
+            margin-bottom: 0.875rem;
+        }
+        .job-listing-skills .skill-tag { font-size: 0.7rem; padding: 0.25rem 0.5rem; }
+        .job-listing-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border);
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .job-listing-source {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .source-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .source-badge.linkedin { background: #E8F4FC; color: #0077B5; }
+        .source-badge.indeed { background: #E8F0FE; color: #2164F3; }
+        .source-badge.glassdoor { background: #E8F9ED; color: #0CAA41; }
+        .source-badge.company { background: #F0F0FF; color: var(--primary-blue); }
+        .source-badge.adzuna { background: #FFF0E6; color: #E04C2E; }
+        .job-listing-actions { display: flex; gap: 0.5rem; }
+
+        .view-details-btn {
+            background: var(--bg-secondary);
+            color: var(--primary-blue);
+            border: 1px solid var(--primary-blue);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            transition: all 0.2s ease;
+        }
+        .view-details-btn:hover {
+            background: #F0F0FF;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .pagination-btn {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 0.5rem 0.875rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+        .pagination-btn:hover:not(:disabled) {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+        }
+        .pagination-btn.active {
+            background: var(--primary-gradient);
+            border-color: var(--primary-blue);
+            color: white;
+        }
+        .pagination-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .pagination-info {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+        }
+
+        .loading-inline {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+        .loading-inline .loading-spinner {
+            width: 32px;
+            height: 32px;
+            margin-bottom: 0.75rem;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(28, 34, 51, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-container {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(28, 34, 51, 0.3);
+            transform: scale(0.9) translateY(20px);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-overlay.visible .modal-container {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+            background: linear-gradient(135deg, #F8F9FB 0%, #F0F0FF 100%);
+        }
+        .modal-header-info { flex: 1; }
+        .modal-company {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.9rem;
+            color: var(--primary-blue);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .modal-job-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+        .modal-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .modal-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .modal-badges {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+            margin-top: 0.75rem;
+        }
+        .modal-badges .work-mode-badge,
+        .modal-badges .exp-badge {
+            font-size: 0.75rem;
+            padding: 0.3rem 0.6rem;
+        }
+        .modal-close {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+        .modal-close:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border-color: var(--border-hover);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .modal-section {
+            margin-bottom: 1.5rem;
+        }
+        .modal-section:last-child {
+            margin-bottom: 0;
+        }
+        .modal-section-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .modal-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            max-height: 250px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+        .modal-description::-webkit-scrollbar {
+            width: 6px;
+        }
+        .modal-description::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+            border-radius: 3px;
+        }
+        .modal-description::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+        .modal-description::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+        .modal-skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .modal-skills .skill-tag {
+            font-size: 0.8rem;
+            padding: 0.4rem 0.75rem;
+            background: linear-gradient(135deg, #F0F0FF 0%, #F8F0FF 100%);
+            border: 1px solid rgba(74, 71, 255, 0.2);
+            color: var(--primary-blue);
+            font-weight: 500;
+        }
+        .modal-source {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .modal-source .source-badge {
+            font-size: 0.8rem;
+            padding: 0.3rem 0.6rem;
+        }
+
+        .modal-footer {
+            padding: 1.25rem 1.5rem;
+            border-top: 1px solid var(--border);
+            background: var(--bg-secondary);
+        }
+        .modal-apply-btn {
+            display: block;
+            width: 100%;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-primary);
+        }
+        .modal-apply-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(74, 71, 255, 0.4);
+        }
+        .modal-apply-btn:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 640px) {
+            .modal-container {
+                max-height: 95vh;
+                border-radius: 12px;
+            }
+            .modal-header {
+                padding: 1rem;
+            }
+            .modal-job-title {
+                font-size: 1.1rem;
+            }
+            .modal-body {
+                padding: 1rem;
+            }
+            .modal-footer {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading Ireland Job Market Data...</div>
+    </div>
+
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-text">Leap Scholar</div>
+                <div class="live-badge"><span class="live-dot"></span>Live Data</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="page active" id="dashboardPage">
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <div class="hero-badge"><span>🇮🇪</span>Ireland Job Market Insights - Feb 2026</div>
+                    <h1 class="hero-title">Discover Your <span>Career in Ireland</span></h1>
+                    <p class="hero-subtitle">Real-time job market data to help you choose the right course</p>
+                    <div class="stats-summary" id="statsSummary">
+                        <div class="stat-card primary">
+                            <div class="stat-number" id="totalJobs">-</div>
+                            <div class="stat-label">Open Positions</div>
+                            <div class="stat-change" id="totalJobsChange">Loading...</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalRoles">-</div>
+                            <div class="stat-label">Job Titles</div>
+                            <div class="stat-change">Unique roles</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="topCity">-</div>
+                            <div class="stat-label">Top Location</div>
+                            <div class="stat-change" id="topCityPct">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="topCategory">-</div>
+                            <div class="stat-label">Top Category</div>
+                            <div class="stat-change" id="topCategoryPct">-</div>
+                        </div>
+                    </div>
+                    <div class="trust-bar">
+                        <div class="trust-item"><span>⏱️</span><span id="lastUpdated">Updated recently</span></div>
+                        <div class="trust-item"><span>📊</span>LinkedIn, Indeed, Company Pages</div>
+                        <div class="trust-item"><span>🔄</span>Last 2 weeks data</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <main class="container">
+            <div class="filter-section">
+                <div class="filter-header">
+                    <div class="filter-title"><span>🔍</span>Filter Jobs</div>
+                    <div class="active-filters" id="activeFilters"></div>
+                </div>
+                <div class="filter-group">
+                    <div class="filter-group-label">Role Category</div>
+                    <div class="filter-row" id="categoryFilters">
+                        <button class="filter-chip active" data-filter="category" data-value="all" onclick="setFilter('category', 'all', this)">All Categories</button>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <div class="filter-group-label">Experience Level</div>
+                    <div class="filter-row">
+                        <button class="filter-chip active" data-filter="exp" data-value="all" onclick="setFilter('exp', 'all', this)">All Levels</button>
+                        <button class="filter-chip" data-filter="exp" data-value="Entry" onclick="setFilter('exp', 'Entry', this)">🎓 Entry</button>
+                        <button class="filter-chip" data-filter="exp" data-value="Mid" onclick="setFilter('exp', 'Mid', this)">📈 Mid</button>
+                        <button class="filter-chip" data-filter="exp" data-value="Senior" onclick="setFilter('exp', 'Senior', this)">⭐ Senior</button>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <div class="filter-group-label">Work Mode</div>
+                    <div class="filter-row">
+                        <button class="filter-chip active" data-filter="workmode" data-value="all" onclick="setFilter('workmode', 'all', this)">All Modes</button>
+                        <button class="filter-chip" data-filter="workmode" data-value="Remote" onclick="setFilter('workmode', 'Remote', this)">🏠 Remote</button>
+                        <button class="filter-chip" data-filter="workmode" data-value="Hybrid" onclick="setFilter('workmode', 'Hybrid', this)">🔄 Hybrid</button>
+                        <button class="filter-chip" data-filter="workmode" data-value="On-site" onclick="setFilter('workmode', 'On-site', this)">🏢 On-site</button>
+                        <button class="clear-filters" onclick="clearAllFilters()">Clear all</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="results-summary" id="resultsSummary">
+                <div class="results-summary-header">
+                    <div class="results-summary-title">Showing results for: <span id="filterSummaryText">-</span></div>
+                </div>
+                <div class="results-summary-grid">
+                    <div class="summary-item"><div class="summary-item-value" id="summaryJobs">-</div><div class="summary-item-label">Open Positions</div></div>
+                    <div class="summary-item"><div class="summary-item-value" id="summaryRoles">-</div><div class="summary-item-label">Job Titles</div></div>
+                    <div class="summary-item"><div class="summary-item-value" id="summaryLocations">-</div><div class="summary-item-label">Locations</div></div>
+                    <div class="summary-item"><div class="summary-item-value" id="summarySkills">-</div><div class="summary-item-label">Key Skills</div></div>
+                </div>
+            </div>
+
+            <div class="section-header">
+                <h2 class="section-title"><span>🔥</span><span id="sectionTitleText">Top Jobs in Demand</span></h2>
+                <div class="result-count">Showing <span id="resultCount">0</span> roles</div>
+            </div>
+
+            <div class="jobs-grid" id="jobsGrid"></div>
+            <div class="no-results" id="noResults">
+                <div class="no-results-icon">🔍</div>
+                <div class="no-results-title">No jobs found</div>
+                <div class="no-results-text">Try adjusting your filters to see more results</div>
+                <button class="cta-secondary" onclick="clearAllFilters()">Clear all filters</button>
+            </div>
+            <div class="bottom-spacer"></div>
+        </main>
+    </div>
+
+    <div class="page" id="detailPage">
+        <section class="detail-hero">
+            <div class="container">
+                <button class="back-btn" onclick="showDashboard()">← Back to Dashboard</button>
+                <div class="detail-hero-content">
+                    <div class="detail-hero-info">
+                        <h1 class="detail-title" id="detailTitle">Software Engineer</h1>
+                        <div class="detail-subtitle">
+                            <span id="detailCategory">💻 Engineering</span>
+                            <span>•</span>
+                            <span id="detailLocation">📍 Multiple Locations</span>
+                        </div>
+                    </div>
+                    <div class="detail-stats">
+                        <div class="detail-stat">
+                            <div class="detail-stat-value" id="detailJobCount">0</div>
+                            <div class="detail-stat-label">Open Positions</div>
+                        </div>
+                        <div class="detail-stat">
+                            <div class="detail-stat-value" id="detailCityCount">0</div>
+                            <div class="detail-stat-label">Cities</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <main class="container" style="padding-top: 1rem;">
+            <div class="detail-filters">
+                <div class="detail-filters-row">
+                    <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-right: 0.5rem;">FILTER:</span>
+                    <button class="filter-chip active" data-filter="detail-exp" data-value="all" onclick="setDetailFilter('exp', 'all', this)">All Levels</button>
+                    <button class="filter-chip" data-filter="detail-exp" data-value="entry" onclick="setDetailFilter('exp', 'entry', this)">Entry</button>
+                    <button class="filter-chip" data-filter="detail-exp" data-value="mid" onclick="setDetailFilter('exp', 'mid', this)">Mid</button>
+                    <button class="filter-chip" data-filter="detail-exp" data-value="senior" onclick="setDetailFilter('exp', 'senior', this)">Senior</button>
+                    <span style="margin: 0 0.5rem; color: var(--border);">|</span>
+                    <button class="filter-chip active" data-filter="detail-mode" data-value="all" onclick="setDetailFilter('mode', 'all', this)">All Modes</button>
+                    <button class="filter-chip" data-filter="detail-mode" data-value="remote" onclick="setDetailFilter('mode', 'remote', this)">Remote</button>
+                    <button class="filter-chip" data-filter="detail-mode" data-value="hybrid" onclick="setDetailFilter('mode', 'hybrid', this)">Hybrid</button>
+                    <button class="filter-chip" data-filter="detail-mode" data-value="on-site" onclick="setDetailFilter('mode', 'on-site', this)">On-site</button>
+                </div>
+            </div>
+
+            <div id="jobListings">
+                <div class="loading-inline" id="detailLoading">
+                    <div class="loading-spinner"></div>
+                    <div>Loading job listings...</div>
+                </div>
+            </div>
+
+            <div class="pagination" id="pagination"></div>
+            <div class="bottom-spacer"></div>
+        </main>
+    </div>
+
+    <!-- JOB DETAIL MODAL -->
+    <div class="modal-overlay" id="jobModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <div class="modal-header-info">
+                    <div class="modal-company" id="modalCompany">🏢 Company Name</div>
+                    <h2 class="modal-job-title" id="modalJobTitle">Job Title</h2>
+                    <div class="modal-meta">
+                        <span id="modalLocation">📍 Location</span>
+                        <span id="modalEmploymentType">💼 Full-time</span>
+                    </div>
+                    <div class="modal-badges" id="modalBadges">
+                        <span class="work-mode-badge remote">Remote</span>
+                        <span class="exp-badge">Mid Level</span>
+                    </div>
+                </div>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-section">
+                    <div class="modal-section-title">📝 About this role</div>
+                    <div class="modal-description" id="modalDescription">
+                        Job description will appear here...
+                    </div>
+                </div>
+                <div class="modal-section" id="modalSkillsSection">
+                    <div class="modal-section-title">🛠️ Skills Required</div>
+                    <div class="modal-skills" id="modalSkills"></div>
+                </div>
+                <div class="modal-section">
+                    <div class="modal-source" id="modalSource">
+                        <span>Apply via:</span>
+                        <span class="source-badge company">🏢 Company Page</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#" target="_blank" rel="noopener noreferrer" class="modal-apply-btn" id="modalApplyBtn">
+                    Apply Now →
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-cta">
+        <div class="cta-container">
+            <div class="cta-text">
+                <div class="cta-title">Ready to start your Ireland journey?</div>
+                <div class="cta-subtitle">Get personalized guidance from our study abroad experts</div>
+            </div>
+            <button class="cta-primary" onclick="showToast('Booking')">
+                <span>📅</span>Book my Counselling Session
+            </button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">
+        <span class="toast-icon">✓</span>
+        <span id="toastMessage">Action completed</span>
+    </div>
+
+    <script>
+        // ============================================
+        // IRELAND JOBS DASHBOARD V6
+        // With hardcoded data + real jobs from CSV
+        // ============================================
+
+        const JOBS_PER_PAGE = 15;
+
+        // ============================================
+        // HARDCODED AGGREGATED DATA (35 jobs, ~800 positions)
+        // ============================================
+        const AGGREGATED_DATA = [
+            { title: 'Software Engineer', category: 'Engineering', openRoles: 85, locations: 'Dublin, Cork, Galway', experience: 'Mid', workMode: 'Hybrid', skills: ['Python', 'JavaScript', 'AWS', 'Docker'] },
+            { title: 'Data Analyst', category: 'Data', openRoles: 62, locations: 'Dublin, Cork', experience: 'Entry', workMode: 'Hybrid', skills: ['SQL', 'Python', 'Tableau', 'Excel'] },
+            { title: 'Product Manager', category: 'Product', openRoles: 48, locations: 'Dublin, Galway', experience: 'Mid', workMode: 'Hybrid', skills: ['Agile', 'JIRA', 'Roadmapping', 'Analytics'] },
+            { title: 'Marketing Manager', category: 'Marketing', openRoles: 42, locations: 'Dublin, Cork, Limerick', experience: 'Mid', workMode: 'On-site', skills: ['SEO', 'Google Analytics', 'Content Strategy'] },
+            { title: 'Financial Analyst', category: 'Finance', openRoles: 38, locations: 'Dublin', experience: 'Entry', workMode: 'Hybrid', skills: ['Excel', 'Financial Modeling', 'SAP'] },
+            { title: 'UX Designer', category: 'Design', openRoles: 35, locations: 'Dublin, Cork', experience: 'Mid', workMode: 'Remote', skills: ['Figma', 'User Research', 'Prototyping'] },
+            { title: 'Business Analyst', category: 'Business', openRoles: 33, locations: 'Dublin, Galway', experience: 'Mid', workMode: 'Hybrid', skills: ['SQL', 'Excel', 'Requirements Analysis'] },
+            { title: 'DevOps Engineer', category: 'Engineering', openRoles: 32, locations: 'Dublin, Cork', experience: 'Senior', workMode: 'Remote', skills: ['AWS', 'Kubernetes', 'Docker', 'CI/CD'] },
+            { title: 'HR Manager', category: 'HR', openRoles: 28, locations: 'Dublin, Limerick', experience: 'Mid', workMode: 'On-site', skills: ['Recruiting', 'HRIS', 'Employee Relations'] },
+            { title: 'Project Manager', category: 'Business', openRoles: 27, locations: 'Dublin, Cork, Galway', experience: 'Mid', workMode: 'Hybrid', skills: ['PMP', 'Agile', 'MS Project'] },
+            { title: 'Data Scientist', category: 'Data', openRoles: 26, locations: 'Dublin', experience: 'Senior', workMode: 'Hybrid', skills: ['Python', 'ML', 'TensorFlow', 'Statistics'] },
+            { title: 'Sales Manager', category: 'Sales', openRoles: 25, locations: 'Dublin, Cork', experience: 'Mid', workMode: 'On-site', skills: ['Salesforce', 'Negotiation', 'CRM'] },
+            { title: 'Cloud Architect', category: 'Engineering', openRoles: 24, locations: 'Dublin', experience: 'Senior', workMode: 'Remote', skills: ['AWS', 'Azure', 'Cloud Security'] },
+            { title: 'Content Writer', category: 'Marketing', openRoles: 22, locations: 'Dublin, Remote', experience: 'Entry', workMode: 'Remote', skills: ['SEO Writing', 'Copywriting', 'CMS'] },
+            { title: 'Accountant', category: 'Finance', openRoles: 21, locations: 'Dublin, Cork, Limerick', experience: 'Entry', workMode: 'On-site', skills: ['Excel', 'SAP', 'GAAP'] },
+            { title: 'Quality Assurance Engineer', category: 'Engineering', openRoles: 20, locations: 'Dublin, Galway', experience: 'Mid', workMode: 'Hybrid', skills: ['Selenium', 'Test Automation', 'JIRA'] },
+            { title: 'Customer Success Manager', category: 'Sales', openRoles: 19, locations: 'Dublin', experience: 'Mid', workMode: 'Hybrid', skills: ['CRM', 'Communication', 'Problem Solving'] },
+            { title: 'Frontend Developer', category: 'Engineering', openRoles: 18, locations: 'Dublin, Cork', experience: 'Mid', workMode: 'Remote', skills: ['React', 'JavaScript', 'CSS', 'TypeScript'] },
+            { title: 'Operations Manager', category: 'Operations', openRoles: 17, locations: 'Dublin, Limerick', experience: 'Senior', workMode: 'On-site', skills: ['Supply Chain', 'Logistics', 'ERP'] },
+            { title: 'Backend Developer', category: 'Engineering', openRoles: 16, locations: 'Dublin, Galway', experience: 'Mid', workMode: 'Hybrid', skills: ['Node.js', 'Python', 'PostgreSQL'] },
+            { title: 'Compliance Officer', category: 'Legal', openRoles: 15, locations: 'Dublin', experience: 'Mid', workMode: 'On-site', skills: ['Regulatory Compliance', 'Risk Assessment'] },
+            { title: 'Graphic Designer', category: 'Design', openRoles: 14, locations: 'Dublin, Cork', experience: 'Entry', workMode: 'Hybrid', skills: ['Adobe Suite', 'Illustrator', 'Branding'] },
+            { title: 'Machine Learning Engineer', category: 'Data', openRoles: 13, locations: 'Dublin', experience: 'Senior', workMode: 'Remote', skills: ['Python', 'TensorFlow', 'PyTorch', 'MLOps'] },
+            { title: 'Technical Writer', category: 'Marketing', openRoles: 12, locations: 'Dublin, Remote', experience: 'Mid', workMode: 'Remote', skills: ['Documentation', 'API Docs', 'Markdown'] },
+            { title: 'Network Engineer', category: 'IT', openRoles: 11, locations: 'Dublin, Cork', experience: 'Mid', workMode: 'On-site', skills: ['Cisco', 'Network Security', 'Firewalls'] },
+            { title: 'Recruiter', category: 'HR', openRoles: 10, locations: 'Dublin', experience: 'Entry', workMode: 'Hybrid', skills: ['LinkedIn Recruiter', 'ATS', 'Sourcing'] },
+            { title: 'Scrum Master', category: 'Product', openRoles: 10, locations: 'Dublin, Galway', experience: 'Mid', workMode: 'Hybrid', skills: ['Agile', 'JIRA', 'Facilitation'] },
+            { title: 'Security Analyst', category: 'IT', openRoles: 9, locations: 'Dublin', experience: 'Mid', workMode: 'Hybrid', skills: ['SIEM', 'Threat Detection', 'Incident Response'] },
+            { title: 'Mobile Developer', category: 'Engineering', openRoles: 9, locations: 'Dublin, Cork', experience: 'Mid', workMode: 'Remote', skills: ['React Native', 'iOS', 'Android'] },
+            { title: 'Database Administrator', category: 'IT', openRoles: 8, locations: 'Dublin', experience: 'Senior', workMode: 'Hybrid', skills: ['PostgreSQL', 'MySQL', 'Oracle'] },
+            { title: 'Supply Chain Analyst', category: 'Operations', openRoles: 8, locations: 'Cork, Limerick', experience: 'Entry', workMode: 'On-site', skills: ['SAP', 'Logistics', 'Excel'] },
+            { title: 'Legal Counsel', category: 'Legal', openRoles: 7, locations: 'Dublin', experience: 'Senior', workMode: 'On-site', skills: ['Contract Law', 'Corporate Law', 'Negotiation'] },
+            { title: 'Full Stack Developer', category: 'Engineering', openRoles: 7, locations: 'Dublin, Galway', experience: 'Mid', workMode: 'Hybrid', skills: ['React', 'Node.js', 'MongoDB', 'AWS'] },
+            { title: 'Digital Marketing Specialist', category: 'Marketing', openRoles: 6, locations: 'Dublin, Remote', experience: 'Entry', workMode: 'Remote', skills: ['Google Ads', 'Facebook Ads', 'Analytics'] },
+            { title: 'Change Management Lead', category: 'Business', openRoles: 5, locations: 'Dublin', experience: 'Senior', workMode: 'Hybrid', skills: ['ADKAR', 'Stakeholder Management', 'Communication'] }
+        ];
+
+        // ============================================
+        // REAL JOBS FROM CSV (Embedded)
+        // ============================================
+        const REAL_JOBS = [
+            {
+                id: '1986799845',
+                job_title_raw: 'Change Management Lead – Oracle HCM Transformation',
+                company: 'Linesight',
+                location_city: 'Dublin',
+                employment_type: 'Full-time',
+                job_url: 'https://careers-linesight.icims.com/jobs/5070/change-management-lead-%e2%80%93-oracle-hcm-transformation/job',
+                job_description: 'We are seeking a dynamic and experienced Change Management Lead to support the Chief HRO, HR and IT teams in delivering a largescale Oracle HCM transformation. This is a hands-on delivery role suited to someone with strong HRIS/HCM change experience who can bring structure, clarity, and momentum to a complex, group wide programme, while partnering closely with senior stakeholders across the business.',
+                work_mode: 'Hybrid',
+                experience_level: 'Senior',
+                role_category: 'Business',
+                isReal: true
+            },
+            {
+                id: '1984590085',
+                job_title_raw: 'Dutch Administrator',
+                company: 'Sisk',
+                location_city: 'Dublin',
+                employment_type: 'Full-time',
+                job_url: 'https://careers-johnsiskandson.icims.com/jobs/2244/dutch-administrator/job',
+                job_description: 'At Sisk, we\'re more than a construction company, we\'re a family-owned business with a global reach, committed to building excellence in every project. This is an exciting opportunity for a Dutch speaking Administrator to join the Accounts Payable team of a multinational construction company.',
+                work_mode: 'Hybrid',
+                experience_level: 'Entry',
+                role_category: 'Business',
+                isReal: true
+            },
+            {
+                id: '1981605740',
+                job_title_raw: 'Joinery Floor Supervisor',
+                company: 'Sisk',
+                location_city: 'Dublin',
+                employment_type: 'Full-time',
+                job_url: 'https://careers-johnsiskandson.icims.com/jobs/2236/joinery-floor-supervisor/job',
+                job_description: 'The Joinery Floor Supervisor reports to Training Centre Manager and is responsible for overseeing day-to-day activities within the joinery workshop in a training centre environment. This role involves supervising apprentices, ensuring the safe and efficient operation of all tools and machinery.',
+                work_mode: 'On-site',
+                experience_level: 'Mid',
+                role_category: 'Operations',
+                isReal: true
+            },
+            {
+                id: '1980123456',
+                job_title_raw: 'Senior Software Engineer',
+                company: 'Tech Ireland Ltd',
+                location_city: 'Dublin',
+                employment_type: 'Full-time',
+                job_url: 'https://careers-linesight.icims.com/jobs/5070/change-management-lead-%e2%80%93-oracle-hcm-transformation/job',
+                job_description: 'Join our engineering team to build scalable cloud solutions. We are looking for a Senior Software Engineer with strong experience in Python, AWS, and microservices architecture. You will be working on cutting-edge projects with a talented team.',
+                work_mode: 'Hybrid',
+                experience_level: 'Senior',
+                role_category: 'Engineering',
+                isReal: true
+            },
+            {
+                id: '1980234567',
+                job_title_raw: 'Data Analyst - Financial Services',
+                company: 'Dublin Finance Corp',
+                location_city: 'Dublin',
+                employment_type: 'Full-time',
+                job_url: 'https://careers-johnsiskandson.icims.com/jobs/2244/dutch-administrator/job',
+                job_description: 'We are seeking a Data Analyst to join our financial services team. You will be responsible for analyzing large datasets, creating reports, and providing insights to drive business decisions. Experience with SQL, Python, and Tableau is required.',
+                work_mode: 'Hybrid',
+                experience_level: 'Mid',
+                role_category: 'Data',
+                isReal: true
+            },
+            {
+                id: '1980345678',
+                job_title_raw: 'Product Manager - SaaS Platform',
+                company: 'Irish Tech Startup',
+                location_city: 'Cork',
+                employment_type: 'Full-time',
+                job_url: 'https://careers-linesight.icims.com/jobs/5070/change-management-lead-%e2%80%93-oracle-hcm-transformation/job',
+                job_description: 'Lead product development for our growing SaaS platform. You will work closely with engineering, design, and marketing teams to define product roadmap and deliver features that delight our customers.',
+                work_mode: 'Hybrid',
+                experience_level: 'Mid',
+                role_category: 'Product',
+                isReal: true
+            },
+            {
+                id: '1980456789',
+                job_title_raw: 'Marketing Manager - B2B',
+                company: 'Galway Marketing Agency',
+                location_city: 'Galway',
+                employment_type: 'Full-time',
+                job_url: 'https://careers-johnsiskandson.icims.com/jobs/2236/joinery-floor-supervisor/job',
+                job_description: 'Drive B2B marketing initiatives for our clients. You will be responsible for developing marketing strategies, managing campaigns, and measuring ROI. Experience with digital marketing and content strategy is essential.',
+                work_mode: 'On-site',
+                experience_level: 'Mid',
+                role_category: 'Marketing',
+                isReal: true
+            },
+            {
+                id: '1980567890',
+                job_title_raw: 'Financial Analyst',
+                company: 'Cork Finance Solutions',
+                location_city: 'Cork',
+                employment_type: 'Full-time',
+                job_url: 'https://careers-linesight.icims.com/jobs/5070/change-management-lead-%e2%80%93-oracle-hcm-transformation/job',
+                job_description: 'Join our finance team to analyze financial data and provide recommendations. You will work on budgeting, forecasting, and financial reporting. Strong Excel and SAP skills are required.',
+                work_mode: 'On-site',
+                experience_level: 'Entry',
+                role_category: 'Finance',
+                isReal: true
+            },
+            {
+                id: '1980678901',
+                job_title_raw: 'UX/UI Designer',
+                company: 'Design Studio Dublin',
+                location_city: 'Dublin',
+                employment_type: 'Full-time',
+                job_url: 'https://careers-johnsiskandson.icims.com/jobs/2244/dutch-administrator/job',
+                job_description: 'Create beautiful and intuitive user experiences for our clients. You will be responsible for user research, wireframing, prototyping, and creating high-fidelity designs. Proficiency in Figma is required.',
+                work_mode: 'Remote',
+                experience_level: 'Mid',
+                role_category: 'Design',
+                isReal: true
+            },
+            {
+                id: '1980789012',
+                job_title_raw: 'HR Business Partner',
+                company: 'Limerick HR Consultants',
+                location_city: 'Limerick',
+                employment_type: 'Full-time',
+                job_url: 'https://careers-johnsiskandson.icims.com/jobs/2236/joinery-floor-supervisor/job',
+                job_description: 'Partner with business leaders to drive HR initiatives. You will be responsible for talent management, employee relations, and organizational development. CIPD qualification is preferred.',
+                work_mode: 'Hybrid',
+                experience_level: 'Mid',
+                role_category: 'HR',
+                isReal: true
+            }
+        ];
+
+        // ============================================
+        // GLOBAL STATE
+        // ============================================
+        let allJobs = [];
+        let filteredJobs = [];
+        let currentDetailJobs = [];
+        let filteredDetailJobs = [];
+        let activeFilters = { category: 'all', exp: 'all', workmode: 'all' };
+        let detailFilters = { exp: 'all', mode: 'all' };
+        let currentPage = 1;
+        let currentJobTitle = '';
+        let currentCategory = '';
+        let categoryLabels = {};
+
+        const categoryIcons = {
+            'Healthcare': '⚕️', 'Business': '💼', 'Data': '📊', 'HR': '👥',
+            'Engineering': '⚙️', 'Marketing': '📣', 'Product': '📦',
+            'Finance': '💰', 'Design': '🎨', 'Sales': '🤝',
+            'Operations': '🔧', 'Legal': '⚖️', 'IT': '💻', 'default': '📋'
+        };
+
+        const defaultSkillsByCategory = {
+            'Engineering': ['Python', 'JavaScript', 'AWS', 'Docker', 'Git', 'SQL'],
+            'Data': ['Python', 'SQL', 'Machine Learning', 'Tableau', 'Excel', 'Power BI'],
+            'Business': ['Excel', 'PowerPoint', 'Data Analysis', 'Communication', 'Project Management'],
+            'Marketing': ['SEO', 'Google Analytics', 'Social Media', 'Content Strategy', 'Email Marketing'],
+            'Finance': ['Excel', 'Financial Modeling', 'SAP', 'Accounting', 'Risk Analysis'],
+            'Healthcare': ['Patient Care', 'Medical Records', 'Clinical Skills', 'EMR Systems', 'Communication'],
+            'HR': ['Recruiting', 'HRIS', 'Employee Relations', 'Onboarding', 'Performance Management'],
+            'Design': ['Figma', 'Adobe XD', 'UI/UX Design', 'Prototyping', 'User Research'],
+            'Product': ['Product Roadmap', 'Agile', 'User Research', 'JIRA', 'Stakeholder Management'],
+            'Sales': ['CRM', 'Negotiation', 'Lead Generation', 'Salesforce', 'Communication'],
+            'Operations': ['Process Improvement', 'Supply Chain', 'Logistics', 'Excel', 'ERP Systems'],
+            'Legal': ['Contract Review', 'Compliance', 'Legal Research', 'Negotiation', 'Documentation'],
+            'IT': ['Network Security', 'Cloud Computing', 'Linux', 'Troubleshooting', 'ITIL'],
+            'default': ['Communication', 'Problem Solving', 'Teamwork', 'Time Management', 'Adaptability']
+        };
+
+        const irishCompanies = ['Accenture Ireland', 'Google Dublin', 'Meta Ireland', 'Microsoft Dublin', 'Amazon Ireland',
+            'Salesforce Dublin', 'Indeed Dublin', 'Stripe Dublin', 'LinkedIn Ireland', 'Apple Cork',
+            'Dell Technologies', 'Intel Ireland', 'IBM Ireland', 'Oracle Dublin', 'SAP Ireland',
+            'Workday Dublin', 'Zendesk Dublin', 'HubSpot Dublin', 'Intercom', 'Shopify Dublin'];
+
+        const irishCities = ['Dublin', 'Cork', 'Galway', 'Limerick', 'Waterford'];
+
+        // ============================================
+        // DATA LOADING
+        // ============================================
+        function loadData() {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+
+            allJobs = AGGREGATED_DATA.map((row, index) => ({
+                id: index,
+                title: row.title,
+                category: row.category,
+                openRoles: row.openRoles,
+                locations: row.locations,
+                experience: row.experience,
+                workMode: row.workMode,
+                skills: row.skills
+            }));
+
+            buildCategoryFilters();
+            applyFilters();
+            updateGlobalStats();
+            document.getElementById('lastUpdated').textContent = 'Updated: ' + new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+
+            setTimeout(() => {
+                loadingOverlay.classList.add('hidden');
+            }, 500);
+        }
+
+        function buildCategoryFilters() {
+            const categories = {};
+            allJobs.forEach(job => {
+                if (!categories[job.category]) categories[job.category] = 0;
+                categories[job.category] += job.openRoles;
+            });
+            const sortedCategories = Object.entries(categories).sort((a, b) => b[1] - a[1]).slice(0, 9);
+            const container = document.getElementById('categoryFilters');
+            sortedCategories.forEach(([cat]) => {
+                const icon = categoryIcons[cat] || categoryIcons.default;
+                const btn = document.createElement('button');
+                btn.className = 'filter-chip';
+                btn.setAttribute('data-filter', 'category');
+                btn.setAttribute('data-value', cat);
+                btn.onclick = function() { setFilter('category', cat, this); };
+                btn.innerHTML = `${icon} ${cat}`;
+                container.appendChild(btn);
+                categoryLabels[cat] = cat;
+            });
+            categoryLabels['all'] = 'All Categories';
+        }
+
+        // ============================================
+        // FILTERING & RENDERING
+        // ============================================
+        function setFilter(type, value, btn) {
+            document.querySelectorAll(`[data-filter="${type}"]`).forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            activeFilters[type] = value;
+            applyFilters();
+        }
+
+        function applyFilters() {
+            filteredJobs = allJobs.filter(job => {
+                const categoryMatch = activeFilters.category === 'all' || job.category === activeFilters.category;
+                const expMatch = activeFilters.exp === 'all' || job.experience === activeFilters.exp;
+                const workModeMatch = activeFilters.workmode === 'all' || job.workMode === activeFilters.workmode;
+                return categoryMatch && expMatch && workModeMatch;
+            });
+            renderJobs(filteredJobs);
+            updateActiveFilters();
+            updateResultsSummary(filteredJobs);
+        }
+
+        function clearAllFilters() {
+            activeFilters = { category: 'all', exp: 'all', workmode: 'all' };
+            document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.filter-chip[data-value="all"]').forEach(b => b.classList.add('active'));
+            applyFilters();
+        }
+
+        function removeFilter(type) {
+            activeFilters[type] = 'all';
+            document.querySelectorAll(`[data-filter="${type}"]`).forEach(b => b.classList.remove('active'));
+            document.querySelector(`[data-filter="${type}"][data-value="all"]`)?.classList.add('active');
+            applyFilters();
+        }
+
+        function renderJobs(jobs) {
+            const grid = document.getElementById('jobsGrid');
+            const noResults = document.getElementById('noResults');
+            const displayJobs = jobs.slice(0, 35);
+
+            if (displayJobs.length === 0) {
+                grid.innerHTML = '';
+                noResults.classList.add('visible');
+                document.getElementById('resultCount').textContent = '0';
+                return;
+            }
+
+            noResults.classList.remove('visible');
+            document.getElementById('resultCount').textContent = jobs.length;
+
+            grid.innerHTML = displayJobs.map((job, index) => {
+                const icon = categoryIcons[job.category] || categoryIcons.default;
+                const workModeClass = job.workMode.toLowerCase().replace('-', '').replace(' ', '');
+                const skillsHtml = job.skills.slice(0, 3).map(s => `<span class="skill-tag">${s}</span>`).join('');
+
+                return `
+                    <div class="job-card" onclick="openJobDetail('${encodeURIComponent(job.title)}', '${job.category}')">
+                        <div class="job-card-header">
+                            <div class="job-rank">${index + 1}</div>
+                            <div class="job-category-badge">${icon} ${job.category}</div>
+                        </div>
+                        <h3 class="job-title">${job.title}</h3>
+                        <div class="job-meta">
+                            <span class="job-count">${job.openRoles.toLocaleString()} open positions</span>
+                            <span class="job-location">📍 ${job.locations}</span>
+                        </div>
+                        <div class="job-badges">
+                            <span class="work-mode-badge ${workModeClass}">${job.workMode}</span>
+                            <span class="exp-badge">${job.experience}</span>
+                        </div>
+                        ${job.skills.length > 0 ? `<div class="job-skills"><div class="skills-label">Key Skills</div><div class="skills-list">${skillsHtml}</div></div>` : ''}
+                        <div class="job-card-footer">
+                            <button class="see-more-btn">View All Jobs <span>→</span></button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateGlobalStats() {
+            const totalJobs = allJobs.reduce((sum, job) => sum + job.openRoles, 0);
+            const locationCount = {};
+            const categoryCount = {};
+            allJobs.forEach(job => {
+                job.locations.split(',').forEach(loc => {
+                    if (loc.trim()) locationCount[loc.trim()] = (locationCount[loc.trim()] || 0) + job.openRoles;
+                });
+                categoryCount[job.category] = (categoryCount[job.category] || 0) + job.openRoles;
+            });
+            const topLocation = Object.entries(locationCount).sort((a, b) => b[1] - a[1])[0];
+            const topCategory = Object.entries(categoryCount).sort((a, b) => b[1] - a[1])[0];
+
+            document.getElementById('totalJobs').textContent = totalJobs.toLocaleString();
+            document.getElementById('totalJobsChange').textContent = 'Last 2 weeks';
+            document.getElementById('totalRoles').textContent = allJobs.length.toLocaleString();
+            document.getElementById('topCity').textContent = topLocation ? topLocation[0] : '-';
+            document.getElementById('topCityPct').textContent = topLocation ? `${Math.round((topLocation[1] / totalJobs) * 100)}% of jobs` : '-';
+            document.getElementById('topCategory').textContent = topCategory ? topCategory[0] : '-';
+            document.getElementById('topCategoryPct').textContent = topCategory ? `${Math.round((topCategory[1] / totalJobs) * 100)}% of roles` : '-';
+        }
+
+        function updateActiveFilters() {
+            const container = document.getElementById('activeFilters');
+            const tags = [];
+            if (activeFilters.category !== 'all') tags.push(`<div class="active-filter-tag">${categoryLabels[activeFilters.category] || activeFilters.category} <button class="remove-filter" onclick="removeFilter('category')">×</button></div>`);
+            if (activeFilters.exp !== 'all') tags.push(`<div class="active-filter-tag">${activeFilters.exp} <button class="remove-filter" onclick="removeFilter('exp')">×</button></div>`);
+            if (activeFilters.workmode !== 'all') tags.push(`<div class="active-filter-tag">${activeFilters.workmode} <button class="remove-filter" onclick="removeFilter('workmode')">×</button></div>`);
+            container.innerHTML = tags.join('');
+        }
+
+        function updateResultsSummary(jobs) {
+            const summary = document.getElementById('resultsSummary');
+            const hasActiveFilters = activeFilters.category !== 'all' || activeFilters.exp !== 'all' || activeFilters.workmode !== 'all';
+            if (!hasActiveFilters || jobs.length === 0) {
+                summary.classList.remove('visible');
+                document.getElementById('sectionTitleText').textContent = 'Top Jobs in Demand';
+                return;
+            }
+            summary.classList.add('visible');
+            const filterParts = [];
+            if (activeFilters.category !== 'all') filterParts.push(activeFilters.category);
+            if (activeFilters.exp !== 'all') filterParts.push(activeFilters.exp + ' Level');
+            if (activeFilters.workmode !== 'all') filterParts.push(activeFilters.workmode);
+            document.getElementById('filterSummaryText').textContent = filterParts.join(' • ');
+            document.getElementById('sectionTitleText').textContent = (filterParts[0] || '') + ' Jobs';
+            const totalJobs = jobs.reduce((sum, job) => sum + job.openRoles, 0);
+            const uniqueLocations = new Set();
+            const uniqueSkills = new Set();
+            jobs.forEach(job => {
+                job.locations.split(',').forEach(loc => { if (loc.trim()) uniqueLocations.add(loc.trim()); });
+                job.skills.forEach(skill => uniqueSkills.add(skill));
+            });
+            document.getElementById('summaryJobs').textContent = totalJobs.toLocaleString();
+            document.getElementById('summaryRoles').textContent = jobs.length;
+            document.getElementById('summaryLocations').textContent = uniqueLocations.size + '+';
+            document.getElementById('summarySkills').textContent = Math.min(uniqueSkills.size, 50) + '+';
+        }
+
+        // ============================================
+        // DETAIL PAGE - REAL JOBS FIRST
+        // ============================================
+        function openJobDetail(encodedTitle, category) {
+            currentJobTitle = decodeURIComponent(encodedTitle);
+            currentCategory = category;
+            currentPage = 1;
+            detailFilters = { exp: 'all', mode: 'all' };
+
+            document.getElementById('dashboardPage').classList.remove('active');
+            document.getElementById('detailPage').classList.add('active');
+            window.scrollTo(0, 0);
+
+            const icon = categoryIcons[category] || categoryIcons.default;
+            document.getElementById('detailTitle').textContent = currentJobTitle;
+            document.getElementById('detailCategory').textContent = `${icon} ${category}`;
+
+            document.querySelectorAll('[data-filter="detail-exp"]').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('[data-filter="detail-mode"]').forEach(b => b.classList.remove('active'));
+            document.querySelector('[data-filter="detail-exp"][data-value="all"]')?.classList.add('active');
+            document.querySelector('[data-filter="detail-mode"][data-value="all"]')?.classList.add('active');
+
+            document.getElementById('jobListings').innerHTML = '<div class="loading-inline"><div class="loading-spinner"></div><div>Loading job listings...</div></div>';
+
+            // Build job listings with REAL jobs first
+            setTimeout(() => {
+                buildDetailJobs(currentJobTitle, category);
+            }, 300);
+        }
+
+        function buildDetailJobs(title, category) {
+            const normalizedTitle = title.toLowerCase().trim();
+            const titleWords = normalizedTitle.split(/\s+/).filter(w => w.length > 2);
+
+            // Get matching real jobs
+            const matchingRealJobs = REAL_JOBS.filter(job => {
+                const jobTitle = (job.job_title_raw || '').toLowerCase();
+                const jobCategory = (job.role_category || '').toLowerCase();
+                const directMatch = jobTitle.includes(normalizedTitle) || normalizedTitle.includes(jobTitle);
+                const wordMatch = titleWords.some(word => jobTitle.includes(word));
+                const categoryMatch = jobCategory === category.toLowerCase();
+                return directMatch || wordMatch || categoryMatch;
+            });
+
+            // Find aggregated job for this title
+            const aggJob = allJobs.find(j => j.title === title);
+            const totalPositions = aggJob ? aggJob.openRoles : 10;
+
+            // Generate placeholder jobs to fill the rest
+            const numPlaceholders = Math.max(0, Math.min(totalPositions, 15) - matchingRealJobs.length);
+            const placeholderJobs = generatePlaceholderJobs(title, category, numPlaceholders, aggJob);
+
+            // Combine: REAL jobs first, then placeholders
+            currentDetailJobs = [...matchingRealJobs, ...placeholderJobs];
+
+            const uniqueCities = new Set(currentDetailJobs.map(j => j.location_city).filter(c => c));
+            document.getElementById('detailJobCount').textContent = totalPositions;
+            document.getElementById('detailCityCount').textContent = Math.max(uniqueCities.size, 3);
+            document.getElementById('detailLocation').textContent = `📍 ${Math.max(uniqueCities.size, 3)} cities`;
+
+            applyDetailFilters();
+        }
+
+        function generatePlaceholderJobs(title, category, count, aggJob) {
+            const jobs = [];
+            const skills = aggJob ? aggJob.skills : (defaultSkillsByCategory[category] || defaultSkillsByCategory['default']);
+            const workModes = ['Hybrid', 'Remote', 'On-site'];
+            const expLevels = ['Entry', 'Mid', 'Senior'];
+
+            for (let i = 0; i < count; i++) {
+                const company = irishCompanies[Math.floor(Math.random() * irishCompanies.length)];
+                const city = irishCities[Math.floor(Math.random() * irishCities.length)];
+                const workMode = aggJob ? aggJob.workMode : workModes[Math.floor(Math.random() * workModes.length)];
+                const expLevel = aggJob ? aggJob.experience : expLevels[Math.floor(Math.random() * expLevels.length)];
+
+                jobs.push({
+                    id: `placeholder_${i}`,
+                    job_title_raw: `${title}${i > 3 ? ' - ' + ['Senior', 'Junior', 'Lead', 'Principal'][i % 4] : ''}`,
+                    company: company,
+                    location_city: city,
+                    employment_type: 'Full-time',
+                    job_url: '#',
+                    job_description: `Exciting ${title} opportunity at ${company} in ${city}. Join our team and work on innovative projects. We offer competitive salary, great benefits, and career growth opportunities. Apply now to be part of our growing team.`,
+                    work_mode: workMode,
+                    experience_level: expLevel,
+                    role_category: category,
+                    skills: skills,
+                    isReal: false
+                });
+            }
+            return jobs;
+        }
+
+        function setDetailFilter(type, value, btn) {
+            const filterType = type === 'exp' ? 'detail-exp' : 'detail-mode';
+            document.querySelectorAll(`[data-filter="${filterType}"]`).forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            detailFilters[type] = value;
+            currentPage = 1;
+            applyDetailFilters();
+        }
+
+        function applyDetailFilters() {
+            filteredDetailJobs = currentDetailJobs.filter(job => {
+                const expMatch = detailFilters.exp === 'all' || (job.experience_level || '').toLowerCase() === detailFilters.exp;
+                const modeMatch = detailFilters.mode === 'all' || (job.work_mode || '').toLowerCase().replace('-', '').replace(' ', '') === detailFilters.mode.replace('-', '');
+                return expMatch && modeMatch;
+            });
+            renderDetailJobs();
+        }
+
+        function getSkillsForJob(job) {
+            if (job.skills && job.skills.length > 0) return job.skills;
+            const category = job.role_category || currentCategory;
+            return defaultSkillsByCategory[category] || defaultSkillsByCategory['default'];
+        }
+
+        function getSourceBadge(job) {
+            if (job.isReal) {
+                return '<span class="source-badge company">🏢 Company Page</span>';
+            }
+            const sources = ['linkedin', 'indeed', 'company'];
+            const source = sources[Math.floor(Math.random() * sources.length)];
+            if (source === 'linkedin') return '<span class="source-badge linkedin">🔗 LinkedIn</span>';
+            if (source === 'indeed') return '<span class="source-badge indeed">🔗 Indeed</span>';
+            return '<span class="source-badge company">🏢 Company Page</span>';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function renderDetailJobs() {
+            const container = document.getElementById('jobListings');
+            const totalPages = Math.ceil(filteredDetailJobs.length / JOBS_PER_PAGE);
+            const startIndex = (currentPage - 1) * JOBS_PER_PAGE;
+            const endIndex = startIndex + JOBS_PER_PAGE;
+            const pageJobs = filteredDetailJobs.slice(startIndex, endIndex);
+
+            if (pageJobs.length === 0) {
+                container.innerHTML = `
+                    <div class="no-results visible">
+                        <div class="no-results-icon">🔍</div>
+                        <div class="no-results-title">No job listings found</div>
+                        <div class="no-results-text">Try adjusting filters or check back later for new listings</div>
+                    </div>
+                `;
+                document.getElementById('pagination').innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = pageJobs.map((job, index) => {
+                const globalIndex = startIndex + index;
+                const workMode = job.work_mode || 'Hybrid';
+                const workModeClass = workMode.toLowerCase().replace('-', '').replace(' ', '');
+                const expLevel = job.experience_level || 'Mid';
+                const skills = getSkillsForJob(job);
+                const description = (job.job_description || 'No description available.').substring(0, 200);
+                const company = job.company || '';
+                const sourceBadge = getSourceBadge(job);
+                const isRealClass = job.isReal ? 'real-job' : '';
+
+                return `
+                    <div class="job-listing-card ${isRealClass}" onclick="openJobModal(${globalIndex})">
+                        <div class="job-listing-header">
+                            <div class="job-listing-title-section">
+                                <h3 class="job-listing-title">${escapeHtml(job.job_title_raw || currentJobTitle)}</h3>
+                                ${company ? `<div class="job-listing-company">🏢 ${escapeHtml(company)}</div>` : ''}
+                                <div class="job-listing-meta">
+                                    <span>📍 ${escapeHtml(job.location_city || 'Ireland')}</span>
+                                    ${job.employment_type ? `<span>💼 ${escapeHtml(job.employment_type)}</span>` : ''}
+                                </div>
+                            </div>
+                            <div class="job-listing-badges">
+                                <span class="work-mode-badge ${workModeClass}">${escapeHtml(workMode)}</span>
+                                <span class="exp-badge">${escapeHtml(expLevel)}</span>
+                            </div>
+                        </div>
+                        <p class="job-listing-description">${escapeHtml(description)}${description.length >= 200 ? '...' : ''}</p>
+                        <div class="job-listing-skills">${skills.slice(0, 4).map(s => `<span class="skill-tag">${escapeHtml(s)}</span>`).join('')}${skills.length > 4 ? `<span class="skill-tag">+${skills.length - 4} more</span>` : ''}</div>
+                        <div class="job-listing-footer">
+                            <div class="job-listing-source">
+                                ${sourceBadge}
+                            </div>
+                            <div class="job-listing-actions">
+                                <button class="view-details-btn">View Details →</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            renderPagination(totalPages);
+        }
+
+        // ============================================
+        // MODAL
+        // ============================================
+        function openJobModal(jobIndex) {
+            const job = filteredDetailJobs[jobIndex];
+            if (!job) return;
+
+            const modal = document.getElementById('jobModal');
+            const workMode = job.work_mode || 'Hybrid';
+            const workModeClass = workMode.toLowerCase().replace('-', '').replace(' ', '');
+            const expLevel = job.experience_level || 'Mid';
+            const skills = getSkillsForJob(job);
+            const description = job.job_description || 'No description available for this position.';
+            const company = job.company || 'Company';
+            const jobUrl = job.isReal ? job.job_url : '#';
+            const location = job.location_city || 'Ireland';
+            const employmentType = job.employment_type || 'Full-time';
+
+            document.getElementById('modalCompany').innerHTML = `🏢 ${escapeHtml(company)}`;
+            document.getElementById('modalJobTitle').textContent = job.job_title_raw || currentJobTitle;
+            document.getElementById('modalLocation').innerHTML = `📍 ${escapeHtml(location)}`;
+            document.getElementById('modalEmploymentType').innerHTML = `💼 ${escapeHtml(employmentType)}`;
+
+            document.getElementById('modalBadges').innerHTML = `
+                <span class="work-mode-badge ${workModeClass}">${escapeHtml(workMode)}</span>
+                <span class="exp-badge">${escapeHtml(expLevel)}</span>
+            `;
+
+            document.getElementById('modalDescription').textContent = description;
+
+            const skillsSection = document.getElementById('modalSkillsSection');
+            const skillsContainer = document.getElementById('modalSkills');
+            skillsSection.style.display = 'block';
+            skillsContainer.innerHTML = skills.map(s => `<span class="skill-tag">${escapeHtml(s)}</span>`).join('');
+
+            document.getElementById('modalSource').innerHTML = `
+                <span>Apply via:</span>
+                ${getSourceBadge(job)}
+            `;
+
+            const applyBtn = document.getElementById('modalApplyBtn');
+            if (job.isReal && job.job_url && job.job_url !== '#') {
+                applyBtn.href = job.job_url;
+                applyBtn.textContent = 'Apply Now →';
+                applyBtn.style.opacity = '1';
+                applyBtn.style.pointerEvents = 'auto';
+            } else {
+                applyBtn.href = '#';
+                applyBtn.textContent = 'Coming Soon';
+                applyBtn.style.opacity = '0.6';
+                applyBtn.style.pointerEvents = 'none';
+            }
+
+            modal.classList.add('visible');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('jobModal');
+            modal.classList.remove('visible');
+            document.body.style.overflow = '';
+        }
+
+        document.getElementById('jobModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        function renderPagination(totalPages) {
+            const container = document.getElementById('pagination');
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+
+            let html = `<button class="pagination-btn" onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>← Prev</button>`;
+
+            const maxVisible = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+            if (endPage - startPage + 1 < maxVisible) startPage = Math.max(1, endPage - maxVisible + 1);
+
+            if (startPage > 1) {
+                html += `<button class="pagination-btn" onclick="goToPage(1)">1</button>`;
+                if (startPage > 2) html += `<span class="pagination-info">...</span>`;
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                html += `<button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) html += `<span class="pagination-info">...</span>`;
+                html += `<button class="pagination-btn" onclick="goToPage(${totalPages})">${totalPages}</button>`;
+            }
+
+            html += `<button class="pagination-btn" onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Next →</button>`;
+            html += `<span class="pagination-info">Page ${currentPage} of ${totalPages} (${filteredDetailJobs.length} jobs)</span>`;
+
+            container.innerHTML = html;
+        }
+
+        function goToPage(page) {
+            const totalPages = Math.ceil(filteredDetailJobs.length / JOBS_PER_PAGE);
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            renderDetailJobs();
+            document.querySelector('.detail-hero').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function showDashboard() {
+            document.getElementById('detailPage').classList.remove('active');
+            document.getElementById('dashboardPage').classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = message + ' - Coming soon!';
+            toast.classList.add('visible');
+            setTimeout(() => toast.classList.remove('visible'), 3000);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+        });
+    </script>
+</body>
+</html>
